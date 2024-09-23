@@ -10,7 +10,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     const token =
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
-    console.log("ACCESS_TOKEN IS :", token);
+    // console.log("ACCESS_TOKEN IS :", token);
 
     if (!token) {
       throw new ApiError(401, "Unauthorized request!");
@@ -20,6 +20,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
     );
+    console.log(decodedToken); //console it
 
     if (!user) {
       // NEXT_VIDEO: discuss about frontend:
