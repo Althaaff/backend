@@ -11,7 +11,6 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
     // console.log("ACCESS_TOKEN IS :", token);
-
     if (!token) {
       throw new ApiError(401, "Unauthorized request!");
     }
@@ -26,7 +25,6 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       // NEXT_VIDEO: discuss about frontend:
       throw new ApiError(401, "Invalid Access Token!");
     }
-
     req.user = user;
     next(); // here next() means that verifyJWT work done at router @ user.routes.js file then its going to the logoutUser //
   } catch (error) {
