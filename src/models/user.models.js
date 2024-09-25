@@ -52,8 +52,9 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return next(); // here user already modified password there is no need to re hash it its already hashed //
 
+  // if password is modified
   this.password = await bcrypt.hash(this.password, 10); // ---> here 10 means hashing 10 rounds //
   next();
 }); // here using arrow function `this` context is we cannot able put inside arrow function
@@ -75,7 +76,8 @@ userSchema.methods.generateAccessToken = function () {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
   );
-  // jwt.sign() is a function used to create a JWT (JSON Web Token). It takes some data (called the "payload") and creates a secure token that can be used to verify a user's identity.
+  // jwt.sign() is a function used to create a JWT (JSON Web Token). It takes some data (called the "payload")
+  // and creates a secure token that can be used to verify a user's identity.
 };
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(

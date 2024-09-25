@@ -159,6 +159,9 @@ const loginUser = asyncHandler(async (req, res) => {
     user._id
   );
 
+  console.log("registerA.Token:", accessToken);
+  console.log("register RefreshToken:", refreshToken);
+
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -253,7 +256,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const { accessToken, newRefreshToken } =
       await generateAccessAndRefereshToken(user._id);
-
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -270,4 +272,134 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  // if u want confirm password ?
+  // const { confPassword } = req.body;
+  // // here condition for confPassword :
+  // if(!(newPassword === confPassword)) {
+  //   throw new ApiError(400, "password does'nt match!");
+  // }
+
+  const user = await User.findById(req.user?._id);
+  console.log("old password :", user.password);
+
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid Old Password!");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed Successfully!"));
+});
+
+//get current user :
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .status(200, req.user, "current user fethed Successfully!");
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body; // here is new values
+
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required!");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id, // tbis line of cocde checks if the user is there then access the user id that use come from authmiddleware //
+    {
+      $set: {
+        // set for here is updating or setting that new values updting only fullName & email //
+        fullName,
+        email: email, // u can use es6
+      },
+    },
+    {
+      new: true, // This option tells Mongoose to return the updated (changed) document instead of the original one.
+    }
+  ).select("-password"); // exclude password (password field is already in our database)
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Acccount details updated Successfully!"));
+});
+
+// multer middleware for updating the files :
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLoacalPath = req.file?.path;
+  if (!avatarLoacalPath) {
+    throw new ApiError(400, "Avatar file is misssing!");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLoacalPath); // uploaded that avatar image to cloudinary //
+
+  // after uploading the any file on cloudinary
+  // cloudinary will provide URL
+  if (!avatar.url) {
+    // here not providing?
+    throw new ApiError(400, "Error while uploading on avatar!");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  // returning the response:
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar Image is Updated Successfully!"));
+});
+
+// coverImage Updating:
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "Cover Image File is Missing!");
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+  if (!coverImage.url) {
+    throw new ApiError(400, "Error while uploading the cover image!");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
+};
