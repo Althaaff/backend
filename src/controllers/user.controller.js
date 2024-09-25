@@ -302,7 +302,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .status(200, req.user, "current user fethed Successfully!");
+    .json(new ApiResponse(200, req.user, "current user fethed Successfully!"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -390,6 +390,11 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
       new: true,
     }
   ).select("-password");
+
+  // returning the response:
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "CoverImage is Updated Successfully!"));
 });
 
 export {
