@@ -494,8 +494,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "videos", // this is the collection from video model `Video` here should be lowercase plural //
-        localField: "watchHistory",
-        foreignField: "_id",
+        localField: "watchHistory", // user watchHistory arary Id's to match the curresponding video Id's
+        foreignField: "_id", // curresponding video Id's
         as: "watchHistory",
 
         pipeline: [
