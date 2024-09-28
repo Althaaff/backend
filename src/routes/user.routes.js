@@ -36,15 +36,15 @@ router.route("/logout").post(verifyJWT, logoutUser); // verifyJWT --> is middlew
 
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword); // here verifyJWT middleware bcoz only loggedin user can do change password //
-router.route("/current-user").post(verifyJWT, getCurrentUser);
+router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails); // here patch bcoz it is intended for making partial updates to an existing resource, such as updating specific account details without modifying the entire account.
 router
   .route("/avatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router
   .route("/cover-image")
-  .patch(verifyJWT, upload.single("/coverImage"), updateUserCoverImage);
-router.route("/c/:username").get(verifyJWT, getUserChannelProfile); // here colon is important `c` --> instead any name u can give
+  .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile); // here colon is important `c` --> instead any name u can use
 router.route("/history").get(verifyJWT, getWatchHistory);
 
 // if we want to users login route :

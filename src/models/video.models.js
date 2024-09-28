@@ -4,8 +4,8 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 const videoSchema = new Schema(
   {
     videoFile: {
-     type: String, // cloudinary url
-     required: true,
+      type: String, // cloudinary url
+      required: true,
     },
     thumbnail: {
       type: String, // cloudinary url
@@ -33,8 +33,8 @@ const videoSchema = new Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "User"
-    }
+      ref: "User",
+    },
   },
   {
     timestamps: true,
@@ -42,5 +42,9 @@ const videoSchema = new Schema(
 );
 
 videoSchema.plugin(mongooseAggregatePaginate);
+// above plugin this mongooseAggregatePaginate means ?
+// bfore we should define option variable store how much video once u want in your page like that
+// --> The line videoSchema.plugin(mongooseAggregatePaginate) adds pagination to the Video model, allowing you to fetch small chunks of data instead of all the data at once. This makes your app faster and more efficient,
+//just like how YouTube only loads a few videos at a time when you browse the platform.
 
 export const Video = mongoose.model("Video", videoSchema);

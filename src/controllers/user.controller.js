@@ -198,12 +198,12 @@ const logoutUser = asyncHandler(async (req, res) => {
   User.findByIdAndUpdate(
     await req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1, // this removes the field from the document
       },
     },
     {
-      new: true,
+      new: true, // this new true means we will get updated doucment instead of getting original document //
     }
   );
   const options = {
@@ -303,7 +303,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
-    .json(new ApiResponse(200, req.user, "current user fethed Successfully!"));
+    .json(new ApiResponse(200, req.user, "current user fetched Successfully!"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -438,10 +438,10 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       // adding extra fields of the doc :
       $addFields: {
         subScribersCount: {
-          $size: "subscribers", // getting subscribers size of the channel
+          $size: "$subscribers", // getting subscribers size of the channel
         },
         channelsSubScribedToCount: {
-          $size: "subscribedTo", // getting the im subscribed size of the channel
+          $size: "$subscribedTo", // getting the im subscribed size of the channel
         },
         // this is for if user is subscribed then button subscribed else subscribe //
         isSubscribed: {
@@ -508,7 +508,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
               pipeline: [
                 {
-                  project: {
+                  $project: {
                     fullName: 1,
                     username: 1,
                     avatar: 1,

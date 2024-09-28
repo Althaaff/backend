@@ -26,7 +26,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       throw new ApiError(401, "Invalid Access Token!");
     }
     req.user = user;
-    next(); // here next() means that verifyJWT work done at router @ user.routes.js file then its going to the logoutUser //
+    next(); // here next() means that verifyJWT work done at router @ user.routes.js file then its going to the next step or logout case logoutUser //
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid Access Token!");
   }
